@@ -1,0 +1,92 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3F51B5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/prati_lokaciju"
+            android:id="@+id/main_activity_start_recording"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="0dp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/prestani_pratiti"
+            android:id="@+id/main_activity_stop_recording"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="0dp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/izbrisi_zapise"
+            android:id="@+id/main_activity_delete_recording"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="0dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/unesi_gpx_datoteku"
+            android:id="@+id/main_activity_gpx"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="0dp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/testni_podaci"
+            android:id="@+id/main_activity_mock_data"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="0dp" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/uslikaj_mapu"
+            android:id="@+id/main_activity_take_screenshot"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="0dp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <fragment
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.ivanmedic.toplinskamapa.MapsActivity"
+            map:cameraTargetLat="43.510829"
+            map:cameraTargetLng="16.469230"
+            map:cameraZoom="13"/>
+    </FrameLayout>
+</LinearLayout>

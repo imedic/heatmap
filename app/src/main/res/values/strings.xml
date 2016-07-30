@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Toplinska Mapa</string>
+    <string name="title_activity_maps">GPS heatmap</string>
+    <string name="prati_lokaciju">Prati lokaciju</string>
+    <string name="prestani_pratiti">Prestani pratiti</string>
+    <string name="izbrisi_zapise">Izbriši zapise</string>
+    <string name="unesi_gpx_datoteku">Unesi .gpx datoteku</string>
+    <string name="testni_podaci">Testni podaci</string>
+    <string name="uslikaj_mapu">Uslikaj mapu</string>
+</resources>
