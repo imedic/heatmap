@@ -5,6 +5,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -36,6 +37,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     MapHelper mapHelper;
 
+    LatLngParser gpsDataParser;
+
     private ArrayList<LatLng> gpsData = new ArrayList<>();
 
     Boolean isFirstLocationReading = true;
@@ -57,6 +60,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        gpsDataParser = new LatLngParser(this);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -144,7 +148,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             case R.id.main_activity_mock_data: {
                 try {
-                    gpsData.addAll(getLatLngFromJSON(R.raw.mock));
+                    gpsData.addAll(gpsDataParser.parseJsonResource(R.raw.mock));
 
                     mapHelper.addHeatMap(gpsData);
 
@@ -177,6 +181,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PICK_GPX_FILE) {
+            if (resultCode == RESULT_OK) {
+                Uri dataUri;
+
+                if(data.getData() == null) {
+                    ClipData dataItems = data.getClipData();
+
+                    for (int i = 0; i < dataItems.getItemCount(); i++) {
+                        try {
+                            dataUri = dataItems.getItemAt(i).getUri();
+
+                            gpsData.addAll(gpsDataParser.parseGpx(dataUri));
+
+                            if (gpsData != null) {
+                                mapHelper.refreshMap(gpsData);
+                                mapHelper.moveMapCamera(gpsData.get(gpsData.size() - 1));
+                            }
+
+                        } catch (Exception e) {
+                            Toast.makeText(this, "Dogodila se pogreška pri očitavanju datoteke", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    try {
+                        dataUri = data.getData();
+
+                        gpsData.addAll(gpsDataParser.parseGpx(dataUri));
+
+                        if (gpsData != null) {
+                            mapHelper.refreshMap(gpsData);
+                            mapHelper.moveMapCamera(gpsData.get(gpsData.size() - 1));
+                        }
+
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Dogodila se pogreška pri očitavanju datoteke", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    }
+
+
     public class LocationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -194,105 +242,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             mapHelper.refreshMap(gpsData);
         }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_GPX_FILE) {
-            if (resultCode == RESULT_OK) {
-                InputStream is;
-
-                if(data.getData() == null) {
-                    ClipData dataItems = data.getClipData();
-
-                    for (int i = 0; i < dataItems.getItemCount(); i++) {
-                        try {
-                            is = getContentResolver().openInputStream(dataItems.getItemAt(i).getUri());
-
-                            gpsData.addAll(getLatLngFromGpx(is));
-
-                            if (gpsData != null) {
-                                mapHelper.refreshMap(gpsData);
-                                mapHelper.moveMapCamera(gpsData.get(gpsData.size() - 1));
-                            }
-
-                        } catch (Exception e) {
-                            Toast.makeText(this, "Dogodila se pogreška pri očitavanju datoteke", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                } else {
-                    try {
-                        is = getContentResolver().openInputStream(data.getData());
-
-                        gpsData.addAll(getLatLngFromGpx(is));
-
-                        if (gpsData != null) {
-                            mapHelper.refreshMap(gpsData);
-                            mapHelper.moveMapCamera(gpsData.get(gpsData.size() - 1));
-                        }
-
-                    } catch (Exception e) {
-                        Toast.makeText(this, "Dogodila se pogreška pri očitavanju datoteke", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        }
-    }
-
-    private ArrayList<LatLng> getLatLngFromGpx(InputStream gpxFile) {
-        ArrayList<LatLng> inputData = new ArrayList<>();
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        String[] gpxTypes = {"wpt", "trkpt"};
-
-        try {
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(gpxFile);
-            Element elementRoot = document.getDocumentElement();
-
-            for (String gpxType : gpxTypes) {
-                NodeList nodelist_trkpt = elementRoot.getElementsByTagName(gpxType);
-
-                for (int j = 0; j < nodelist_trkpt.getLength(); j++) {
-
-                    Node node = nodelist_trkpt.item(j);
-                    NamedNodeMap attributes = node.getAttributes();
-
-                    String lat = attributes.getNamedItem("lat").getTextContent();
-                    Double lat_double = Double.parseDouble(lat);
-
-                    String lng = attributes.getNamedItem("lon").getTextContent();
-                    Double lng_double = Double.parseDouble(lng);
-
-                    LatLng newLocation = new LatLng(lat_double, lng_double);
-
-                    inputData.add(newLocation);
-                }
-            }
-        }
-        catch (Exception e) {
-            Toast.makeText(this, "Dogodila se pogreška", Toast.LENGTH_LONG).show();
-        }
-
-        return inputData;
-    }
-
-    private ArrayList<LatLng> getLatLngFromJSON(int resource) throws JSONException {
-
-        ArrayList<LatLng> list = new ArrayList<>();
-
-        InputStream inputStream = getResources().openRawResource(resource);
-
-        String json = new Scanner(inputStream).useDelimiter("\\A").next();
-
-        JSONArray array = new JSONArray(json);
-
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject object = array.getJSONObject(i);
-            double lat = object.getDouble("lat");
-            double lng = object.getDouble("lng");
-            list.add(new LatLng(lat, lng));
-        }
-
-        return list;
     }
 }

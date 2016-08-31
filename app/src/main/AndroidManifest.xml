@@ -4,7 +4,7 @@
     package="com.ivanmedic.toplinskamapa">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
@@ -40,7 +40,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".MapsActivity$MyReceiver">
+        <receiver android:name=".MapsActivity$LocationReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.LOCATION_UPDATE">
                 </action>

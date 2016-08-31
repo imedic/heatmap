@@ -27,10 +27,12 @@ public class LocationService extends Service{
     }
 
     @Override
-    public void onStart(Intent intent, int startId) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         listener = new locationListener();
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, listener);
+
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -40,7 +42,6 @@ public class LocationService extends Service{
         locationManager.removeUpdates(listener);
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -48,11 +49,11 @@ public class LocationService extends Service{
 
     public class locationListener implements LocationListener {
 
-        public void onLocationChanged(final Location loc) {
-            loc.getLatitude();
-            loc.getLongitude();
-            intent.putExtra("Latitude", loc.getLatitude());
-            intent.putExtra("Longitude", loc.getLongitude());
+        public void onLocationChanged(final Location location) {
+            location.getLatitude();
+            location.getLongitude();
+            intent.putExtra("Latitude", location.getLatitude());
+            intent.putExtra("Longitude", location.getLongitude());
             sendBroadcast(intent);
         }
 
@@ -63,7 +64,6 @@ public class LocationService extends Service{
         public void onProviderEnabled(String provider) {
             Toast.makeText( getApplicationContext(), "Gps Enabled", Toast.LENGTH_SHORT).show();
         }
-
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
 
