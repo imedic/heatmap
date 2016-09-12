@@ -62,12 +62,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         gpsDataParser = new LatLngParser(this);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        // Uzima SupportMapFragment i obavještava kad je mapa spremna za upotrebu.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
+        //Programski dohvat tipaka sa tipa prikaza:
         startRecordingButton = (Button) findViewById(R.id.main_activity_start_recording);
         startRecordingButton.setOnClickListener(this);
 
@@ -87,12 +87,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         takeScreenshotButton = (Button) findViewById(R.id.main_activity_take_screenshot);
         takeScreenshotButton.setOnClickListener(this);
 
-
-        serviceIntent = new Intent(this, LocationService.class);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("LOCATION_UPDATE");
-        LocationReceiver receiver = new LocationReceiver();
-        registerReceiver(receiver, filter);
+        //Kreiranje namjere za primanje ažuriranja o lokaciji:
+        serviceIntent = new Intent(this, LocationService.class);  //Namjera se šalje servisu LocationService
+        IntentFilter filter = new IntentFilter(); //definiramo svojstva
+        filter.addAction("LOCATION_UPDATE");     // namjere
+        LocationReceiver receiver = new LocationReceiver(); //Kreira se instanca primatelja prijenosa
+        registerReceiver(receiver, filter);  //Registrira se primaetlj prijenosa
     }
 
     @Override
@@ -100,7 +100,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onDestroy();
         stopService(serviceIntent);
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -110,15 +109,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+
+            //Ukoliko id pritisnute tipke odgovara case id-u izvrši sljedeći kod:
             case R.id.main_activity_start_recording: {
+                //Pokretanje servisa
                 startService(serviceIntent);
 
+                //Pojedine tipke se onesposobe tako da se ne mogu pritisnuti
                 stopRecordingButton.setEnabled(true);
                 startRecordingButton.setEnabled(false);
                 insertMockDataButton.setEnabled(false);
                 deleteRecordsButton.setEnabled(false);
                 insertGpxButton.setEnabled(false);
 
+                //Pritiskom na tipku prikazat će se tekst u oblačicu
                 Toast.makeText(this, "Očitavanje lokacije", Toast.LENGTH_SHORT).show();
 
                 break;
